@@ -198,15 +198,4 @@ Test가 2개로 나뉨:
 
 👉 **“고객 행동 + 금융 상태를 기반으로 이탈 확률과 미래 가치를 동시에 예측하는 고난도 고객 분석 문제”**
 
----
 
-# 다음 단계 제안
-
-이제 선택해야 함:
-
-1. **EDA부터 같이 할지**
-2. **Feature engineering 설계 먼저 할지**
-3. **모델링 전략 바로 짤지**
-
-원하면 “우승 전략 수준”으로 단계별 설계 같이 해줄게.
-<img width="1891" height="654" alt="image" src="https://github.com/user-attachments/assets/01a70bff-f8a3-4583-acb3-a68f1529e658" />
