@@ -7,7 +7,6 @@ from google.colab import drive
 drive.mount('/content/drive')
 
 1. 데이터 로드
-
 customer = pd.read_csv("/content/drive/MyDrive/2026 공모전-SAS 데이터분석/2회 경진대회 데이터/train/train_customer_info.csv")
 transaction = pd.read_csv("/content/drive/MyDrive/2026 공모전-SAS 데이터분석/2회 경진대회 데이터/train/train_transaction_history.csv")
 finance = pd.read_csv("/content/drive/MyDrive/2026 공모전-SAS 데이터분석/2회 경진대회 데이터/train/train_finance_profile.csv")
