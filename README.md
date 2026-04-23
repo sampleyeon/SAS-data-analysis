@@ -180,6 +180,8 @@ card_cash_service_amt         989
            is_married         167
                gender         163
      category_nunique          98
+     
 ---
+
 # 4주차 모델
 * 모델 결합 
