@@ -112,10 +112,37 @@
 
 </details>
 
-# 요약
 **“고객 행동 + 금융 상태를 기반으로 이탈 확률과 미래 가치를 동시에 예측하는 고난도 고객 분석 문제”**
 
 ---
+## 실험 및 제출 기록 (Submission History)
+
+<details>
+  <summary><b>Submission 2: Baseline 모델 구축</b></summary>
+  
+  - **모델:** Logistic Regression
+  - **특징:** 기본 수치형 데이터만 사용
+  - **결과:** Public Score 0.75
+</details>
+
+<details>
+  <summary><b>Submission 3: 피처 엔지니어링 및 모델 교체</b></summary>
+  
+  - **모델:** XGBoost
+  - **변경 사항:** - 상관관계가 낮았던 `ID` 필드 등 불필요한 피처 삭제
+    - 범주형 변수 원-핫 인코딩 적용
+  - **결과:** Public Score 0.81 (상승!)
+</details>
+
+<details>
+  <summary><b>Submission 4: 최종 최적화 (현재 버전)</b></summary>
+  
+  - **모델:** XGBoost + Hyperparameter Tuning
+  - **변경 사항:** - `is_weekend` 파생 피처 추가
+    - 과적합 방지를 위해 `max_depth` 조정
+  - **결과:** Public Score 0.85
+</details>
+
 # 1~3주차 중간 결과
 * CV AUC  평균: 0.7923  std: 0.0080  (기존: 0.7887)
 * CV RMSE 평균: 1,401,187  std: 17,666  (기존: 1,376,715)
