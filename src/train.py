@@ -1,3 +1,10 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+import lightgbm as lgb
+from sklearn.metrics import roc_auc_score, mean_squared_error
+from sklearn.model_selection import StratifiedKFold
+
 # 모델 학습 준비
 drop_cols = ['customer_id', 'target_churn', 'target_ltv', 'target_ltv_log']
 
