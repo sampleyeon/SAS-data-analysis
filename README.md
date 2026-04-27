@@ -118,7 +118,7 @@
 ## 실험 및 제출 기록 (Submission History)
 
 <details>
-  <summary><b>Submission 2: Baseline 모델 구축</b></summary>
+  <summary><b>submission V1</b></summary>
   
   - **모델:** Logistic Regression
   - **특징:** 기본 수치형 데이터만 사용
