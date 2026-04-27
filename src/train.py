@@ -1,76 +1,149 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
 import lightgbm as lgb
+
 from sklearn.metrics import roc_auc_score, mean_squared_error
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 
-# 모델 학습 준비
-drop_cols = ['customer_id', 'target_churn', 'target_ltv', 'target_ltv_log']
 
-X = df.drop(columns=drop_cols)
-y_churn = df['target_churn']
-y_ltv = df['target_ltv_log']
+# =========================
+# 1. Feature 준비
+# =========================
+def prepare_features(df):
 
-print(f"X shape      : {X.shape}")
-print(f"y_churn 분포 : {y_churn.value_counts().to_dict()}")
-print(f"y_ltv   범위 : {y_ltv.min():.2f} ~ {y_ltv.max():.2f}")
+    drop_cols = [
+        'customer_id',
+        'target_churn',
+        'target_ltv',
+        'target_ltv_log'
+    ]
 
-# 데이터셋 분할
-from sklearn.model_selection import train_test_split
+    X = df.drop(columns=drop_cols)
+    y_churn = df['target_churn']
+    y_ltv   = df['target_ltv_log']   # log 기준 유지
 
-X_train, X_val, y_churn_train, y_churn_val, y_ltv_train, y_ltv_val = train_test_split(
-    X, y_churn, y_ltv,
-    test_size    = 0.2,
-    random_state = 42,
-    stratify     = y_churn
-)
+    return X, y_churn, y_ltv
 
-print(f"Train : {X_train.shape}")
-print(f"Val   : {X_val.shape}")
 
-# 모델 학습
-# ── Churn 모델 ──
-churn_model = lgb.LGBMClassifier(
-    n_estimators     = 1000,
-    learning_rate    = 0.05,
-    num_leaves       = 31,
-    scale_pos_weight = 9,
-    random_state     = 42,
-    verbose          = -1
-)
+# =========================
+# 2. Cross Validation
+# =========================
+def run_cv(X, y_churn, y_ltv, df, n_splits=5):
 
-churn_model.fit(
-    X_train, y_churn_train,
-    eval_set  = [(X_val, y_churn_val)],
-    callbacks = [lgb.early_stopping(50), lgb.log_evaluation(100)]
-)
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
-# ── LTV 모델 ──
-ltv_model = lgb.LGBMRegressor(
-    n_estimators  = 1000,
-    learning_rate = 0.05,
-    num_leaves    = 31,
-    random_state  = 42,
-    verbose       = -1
-)
+    auc_scores  = []
+    rmse_scores = []
 
-ltv_model.fit(
-    X_train, y_ltv_train,
-    eval_set  = [(X_val, y_ltv_val)],
-    callbacks = [lgb.early_stopping(50), lgb.log_evaluation(100)]
-)
+    for fold, (train_idx, val_idx) in enumerate(skf.split(X, y_churn)):
 
-# 성능 확인 (첫시도)
-# ── Churn AUC ──
-churn_pred_proba = churn_model.predict_proba(X_val)[:, 1]
-auc = roc_auc_score(y_churn_val, churn_pred_proba)
-print(f"Churn AUC : {auc:.4f}")
+        X_tr, X_vl   = X.iloc[train_idx], X.iloc[val_idx]
+        yc_tr, yc_vl = y_churn.iloc[train_idx], y_churn.iloc[val_idx]
+        yl_tr, yl_vl = y_ltv.iloc[train_idx], y_ltv.iloc[val_idx]
 
-# ── LTV RMSE (log 역변환 후) ──
-ltv_pred_log = ltv_model.predict(X_val)
-ltv_pred     = np.expm1(ltv_pred_log)
-ltv_actual   = np.expm1(y_ltv_val)
+        # ── Churn ──
+        cm = lgb.LGBMClassifier(
+            n_estimators=2000,
+            learning_rate=0.01,
+            num_leaves=31,
+            min_child_samples=20,
+            scale_pos_weight=5,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            random_state=42,
+            verbose=-1
+        )
 
-rmse = np.sqrt(mean_squared_error(ltv_actual, ltv_pred))
-print(f"LTV RMSE  : {rmse:,.0f}")
+        cm.fit(
+            X_tr, yc_tr,
+            eval_set=[(X_vl, yc_vl)],
+            callbacks=[lgb.early_stopping(100, verbose=False)]
+        )
+
+        auc = roc_auc_score(yc_vl, cm.predict_proba(X_vl)[:, 1])
+        auc_scores.append(auc)
+
+        # ── LTV ──
+        lm = lgb.LGBMRegressor(
+            n_estimators=2000,
+            learning_rate=0.01,
+            num_leaves=31,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            random_state=42,
+            verbose=-1
+        )
+
+        lm.fit(
+            X_tr, yl_tr,
+            eval_set=[(X_vl, yl_vl)],
+            callbacks=[lgb.early_stopping(100, verbose=False)]
+        )
+
+        ltv_pred   = np.expm1(lm.predict(X_vl))     # log → 원복
+        ltv_actual = np.expm1(yl_vl)
+
+        rmse = np.sqrt(mean_squared_error(ltv_actual, ltv_pred))
+        rmse_scores.append(rmse)
+
+        print(f"Fold {fold+1} | AUC: {auc:.4f} | RMSE: {rmse:,.0f}")
+
+    print("\n===== CV 결과 =====")
+    print(f"AUC  : {np.mean(auc_scores):.4f}")
+    print(f"RMSE : {np.mean(rmse_scores):,.0f}")
+
+    return auc_scores, rmse_scores
+
+
+# =========================
+# 3. 최종 모델 학습
+# =========================
+def train_final_model(X, y_churn, y_ltv):
+
+    # 전체 데이터로 학습 (validation 없음)
+    churn_model = lgb.LGBMClassifier(
+        n_estimators=2000,
+        learning_rate=0.01,
+        num_leaves=31,
+        min_child_samples=20,
+        scale_pos_weight=5,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        random_state=42,
+        verbose=-1
+    )
+
+    churn_model.fit(X, y_churn)
+
+    ltv_model = lgb.LGBMRegressor(
+        n_estimators=2000,
+        learning_rate=0.01,
+        num_leaves=31,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        random_state=42,
+        verbose=-1
+    )
+
+    ltv_model.fit(X, y_ltv)
+
+    return churn_model, ltv_model
+
+
+# =========================
+# 4. 전체 실행 함수
+# =========================
+def train(df):
+
+    # 1. feature 준비
+    X, y_churn, y_ltv = prepare_features(df)
+
+    print(f"X shape: {X.shape}")
+
+    # 2. CV로 성능 확인 (선택)
+    run_cv(X, y_churn, y_ltv, df)
+
+    # 3. 최종 모델 학습
+    churn_model, ltv_model = train_final_model(X, y_churn, y_ltv)
+
+    return churn_model, ltv_model
