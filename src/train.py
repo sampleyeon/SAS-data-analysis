@@ -1,116 +1,69 @@
-# ─────────────────────────────
-# 1. 모델 생성 함수
-# ─────────────────────────────
-def get_models():
+# 모델 학습 준비
+drop_cols = ['customer_id', 'target_churn', 'target_ltv', 'target_ltv_log']
 
-    churn_model = lgb.LGBMClassifier(
-        n_estimators=2000,
-        learning_rate=0.01,
-        num_leaves=31,
-        min_child_samples=20,
-        scale_pos_weight=5,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        random_state=42,
-        verbose=-1
-    )
+X = df.drop(columns=drop_cols)
+y_churn = df['target_churn']
+y_ltv = df['target_ltv_log']
 
-    ltv_model = lgb.LGBMRegressor(
-        n_estimators=2000,
-        learning_rate=0.01,
-        num_leaves=31,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        random_state=42,
-        verbose=-1
-    )
+print(f"X shape      : {X.shape}")
+print(f"y_churn 분포 : {y_churn.value_counts().to_dict()}")
+print(f"y_ltv   범위 : {y_ltv.min():.2f} ~ {y_ltv.max():.2f}")
 
-    return churn_model, ltv_model
+# 데이터셋 분할
+from sklearn.model_selection import train_test_split
 
-# ─────────────────────────────
-# 2. Hold-out 평가
-# ─────────────────────────────
-def train_and_evaluate(X, y_churn, y_ltv):
+X_train, X_val, y_churn_train, y_churn_val, y_ltv_train, y_ltv_val = train_test_split(
+    X, y_churn, y_ltv,
+    test_size    = 0.2,
+    random_state = 42,
+    stratify     = y_churn
+)
 
-    from sklearn.model_selection import train_test_split
+print(f"Train : {X_train.shape}")
+print(f"Val   : {X_val.shape}")
 
-    X_train, X_val, yc_tr, yc_val, yl_tr, yl_val = train_test_split(
-        X, y_churn, y_ltv,
-        test_size=0.2,
-        random_state=42,
-        stratify=y_churn
-    )
+# 모델 학습
+# ── Churn 모델 ──
+churn_model = lgb.LGBMClassifier(
+    n_estimators     = 1000,
+    learning_rate    = 0.05,
+    num_leaves       = 31,
+    scale_pos_weight = 9,
+    random_state     = 42,
+    verbose          = -1
+)
 
-    churn_model, ltv_model = get_models()
+churn_model.fit(
+    X_train, y_churn_train,
+    eval_set  = [(X_val, y_churn_val)],
+    callbacks = [lgb.early_stopping(50), lgb.log_evaluation(100)]
+)
 
-    # Churn
-    churn_model.fit(
-        X_train, yc_tr,
-        eval_set=[(X_val, yc_val)],
-        callbacks=[lgb.early_stopping(100)]
-    )
+# ── LTV 모델 ──
+ltv_model = lgb.LGBMRegressor(
+    n_estimators  = 1000,
+    learning_rate = 0.05,
+    num_leaves    = 31,
+    random_state  = 42,
+    verbose       = -1
+)
 
-    # LTV
-    ltv_model.fit(
-        X_train, yl_tr,
-        eval_set=[(X_val, yl_val)],
-        callbacks=[lgb.early_stopping(100)]
-    )
+ltv_model.fit(
+    X_train, y_ltv_train,
+    eval_set  = [(X_val, y_ltv_val)],
+    callbacks = [lgb.early_stopping(50), lgb.log_evaluation(100)]
+)
 
-    return churn_model, ltv_model
+# 성능 확인 (첫시도)
+# ── Churn AUC ──
+churn_pred_proba = churn_model.predict_proba(X_val)[:, 1]
+auc = roc_auc_score(y_churn_val, churn_pred_proba)
+print(f"Churn AUC : {auc:.4f}")
 
-# ─────────────────────────────
-# 3. Cross Validation
-# ─────────────────────────────
-def run_cv(X, y_churn, y_ltv, df, n_splits=5, random_state=42):
+# ── LTV RMSE (log 역변환 후) ──
+ltv_pred_log = ltv_model.predict(X_val)
+ltv_pred     = np.expm1(ltv_pred_log)
+ltv_actual   = np.expm1(y_ltv_val)
 
-    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-
-    auc_scores  = []
-    rmse_scores = []
-
-    for fold, (train_idx, val_idx) in enumerate(skf.split(X, y_churn)):
-
-        X_tr, X_vl   = X.iloc[train_idx], X.iloc[val_idx]
-        yc_tr, yc_vl = y_churn.iloc[train_idx], y_churn.iloc[val_idx]
-        yl_tr, yl_vl = y_ltv.iloc[train_idx], y_ltv.iloc[val_idx]
-
-        # 모델 가져오기
-        cm, lm = get_models()
-
-        # ── Churn ──
-        cm.fit(
-            X_tr, yc_tr,
-            eval_set=[(X_vl, yc_vl)],
-            callbacks=[
-                lgb.early_stopping(100, verbose=False),
-                lgb.log_evaluation(-1)
-            ]
-        )
-
-        auc = roc_auc_score(yc_vl, cm.predict_proba(X_vl)[:, 1])
-        auc_scores.append(auc)
-
-        # ── LTV ──
-        lm.fit(
-            X_tr, yl_tr,
-            eval_set=[(X_vl, yl_vl)],
-            callbacks=[
-                lgb.early_stopping(100, verbose=False),
-                lgb.log_evaluation(-1)
-            ]
-        )
-
-        ltv_pred   = lm.predict(X_vl) ** 2
-        ltv_actual = df['target_ltv'].iloc[val_idx]
-
-        rmse = np.sqrt(mean_squared_error(ltv_actual, ltv_pred))
-        rmse_scores.append(rmse)
-
-        print(f"Fold {fold+1}  AUC: {auc:.4f}  RMSE: {rmse:,.0f}")
-
-    print(f"\n{'='*45}")
-    print(f"CV AUC  평균: {np.mean(auc_scores):.4f}  std: {np.std(auc_scores):.4f}")
-    print(f"CV RMSE 평균: {np.mean(rmse_scores):,.0f}  std: {np.std(rmse_scores):,.0f}")
-
-    return auc_scores, rmse_scores
+rmse = np.sqrt(mean_squared_error(ltv_actual, ltv_pred))
+print(f"LTV RMSE  : {rmse:,.0f}")
