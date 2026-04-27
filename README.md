@@ -3,34 +3,9 @@
 ## 공모전 개요
 
 <details>
-  <summary><b>Submission 2: Baseline 모델 구축</b></summary>
-  
-  - **모델:** Logistic Regression
-  - **특징:** 기본 수치형 데이터만 사용
-  - **결과:** Public Score 0.75
-</details>
+  <summary><b>문제 정의</b></summary>
 
-<details>
-  <summary><b>Submission 3: 피처 엔지니어링 및 모델 교체</b></summary>
-  
-  - **모델:** XGBoost
-  - **변경 사항:** - 상관관계가 낮았던 `ID` 필드 등 불필요한 피처 삭제
-    - 범주형 변수 원-핫 인코딩 적용
-  - **결과:** Public Score 0.81 (상승!)
-</details>
-
-<details>
-  <summary><b>Submission 4: 최종 최적화 (현재 버전)</b></summary>
-  
-  - **모델:** XGBoost + Hyperparameter Tuning
-  - **변경 사항:** - `is_weekend` 파생 피처 추가
-    - 과적합 방지를 위해 `max_depth` 조정
-  - **결과:** Public Score 0.85
-</details>
-
-# 1. 문제 정의 (핵심 과제)
-
-  ### Task 1: Churn (이탈)
+ ### Task 1: Churn (이탈)
   
   * 목표: 고객 이탈 여부 확률 예측   
   * 출력: 0~1 확률값
@@ -53,6 +28,29 @@
   * **분류 + 회귀 동시에 최적화 필요**
   
   ---
+</details>
+
+<details>
+  <summary><b>Submission 3: 피처 엔지니어링 및 모델 교체</b></summary>
+  
+  - **모델:** XGBoost
+  - **변경 사항:** - 상관관계가 낮았던 `ID` 필드 등 불필요한 피처 삭제
+    - 범주형 변수 원-핫 인코딩 적용
+  - **결과:** Public Score 0.81 (상승!)
+</details>
+
+<details>
+  <summary><b>Submission 4: 최종 최적화 (현재 버전)</b></summary>
+  
+  - **모델:** XGBoost + Hyperparameter Tuning
+  - **변경 사항:** - `is_weekend` 파생 피처 추가
+    - 과적합 방지를 위해 `max_depth` 조정
+  - **결과:** Public Score 0.85
+</details>
+
+# 1. 문제 정의 (핵심 과제)
+
+  
 
 # 2. 데이터 구조
 
