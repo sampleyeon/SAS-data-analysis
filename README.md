@@ -73,77 +73,29 @@
 </details>
 
 <details>
-  <summary><b>Submission 4: 최종 최적화 (현재 버전)</b></summary>
+  <summary><b>모델</b></summary>
   
-  - **모델:** XGBoost + Hyperparameter Tuning
-  - **변경 사항:** - `is_weekend` 파생 피처 추가
-    - 과적합 방지를 위해 `max_depth` 조정
-  - **결과:** Public Score 0.85
-</details>
-
-
-
-총 3개 입력 테이블 + 1개 타겟
-
-  ## 1) 고객 정보 (정적 데이터)
+  ### 1) 모델 전략
   
-  * 나이, 성별, 지역, 결혼 여부, 소득 수준 등
-  -> * **기본 세그먼트 분류**
-  
-  ---
-  
-  ## 2) 거래 이력 (시계열 데이터)
-  
-  * 기간: 2023-07 ~ 2023-12
-  * 구매 금액, 채널, 카테고리, 할부 여부
-  * 반드시 aggregation + feature engineering 필요
-  
-  예:
-  
-  * 최근 1개월 소비금액
-  * 구매 빈도
-  * 카테고리 다양성
-  * 온라인 vs 오프라인 비율
-  * 소비 감소 추세
-  
-  ---
-  
-  ## 3) 타겟
-  
-  * churn: binary
-  * ltv: continuous
-
----
-
-# 3. 데이터 규모
-
-* Train: 60,000명
-* Test: 40,000명
-* feature engineering 영향 매우 큼
-
-  ---
-  
-  ## 1) 모델 전략
-  
-  ### Churn
+  #### Churn
   
   * LightGBM / XGBoost (AUC 최적화)
   
-  ### LTV
+  #### LTV
   
   * LightGBM Regressor
   * 또는 log 변환 후 회귀
   
   ---
   
-  ## 2) 멀티태스크 전략
+  ### 2) 멀티태스크 전략
   
   * churn 예측값을 LTV feature로 사용
   * churn=1 그룹 / 0 그룹 나눠 LTV 모델 분리
   
   ---
   
-  ## 3) 검증 전략 (중요)
+  ### 3) 검증 전략 (중요)
   
   * 단순 KFold
   * 추천:
@@ -152,13 +104,13 @@
   
   ---
   
-  ## 4) 리더보드 전략
+  ### 4) 리더보드 전략
   
   * 과적합 방지
   * seed averaging
   * ensemble 필수
 
----
+</details>
 
 # 요약
 **“고객 행동 + 금융 상태를 기반으로 이탈 확률과 미래 가치를 동시에 예측하는 고난도 고객 분석 문제”**
