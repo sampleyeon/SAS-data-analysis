@@ -121,7 +121,37 @@
   <summary><b>exp_v1: baseline model</b></summary>
   
   - **모델:** LightGBM
-  - **결과:** Churn AUC : 0.7804, LTV RMSE  : 1,515,256
+  - **결과:**
+============================== [ V1_Baseline RESULT ] ==============================
+Final Score: 0.4230 (AUC: 0.7804, LTV_Score: 0.0657)
+LTV RMSE: 1,515,256
+
+[ V1_Baseline Churn Top 10 ]
+              feature  importance
+total_deposit_balance          25
+        card_loan_amt          17
+         credit_score          15
+card_cash_service_amt           8
+fin_asset_trend_score           4
+          amt_prev_5m           3
+    mean_purchase_gap           2
+      amt_trend_ratio           2
+            join_days           2
+    installment_ratio           2
+
+[ V1_Baseline LTV Top 10 ]
+              feature  importance
+total_deposit_balance         311
+        card_loan_amt         217
+         credit_score         111
+fin_asset_trend_score         106
+    installment_ratio          74
+card_cash_service_amt          65
+          mean_amount          61
+            join_days          52
+           min_amount          51
+      amt_trend_ratio          49
+======================================================================
 </details>
 
 <details>
