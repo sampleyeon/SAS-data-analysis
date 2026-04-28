@@ -138,20 +138,20 @@ fin_asset_trend_score           4
       amt_trend_ratio           2
             join_days           2
     installment_ratio           2
-
-[ V1_Baseline LTV Top 10 ]
-              feature  importance
-total_deposit_balance         311
-        card_loan_amt         217
-         credit_score         111
-fin_asset_trend_score         106
-    installment_ratio          74
-card_cash_service_amt          65
-          mean_amount          61
-            join_days          52
-           min_amount          51
-      amt_trend_ratio          49
-======================================================================
+    
+    [ V1_Baseline LTV Top 10 ]
+              feature        importance
+    total_deposit_balance         311
+            card_loan_amt         217
+             credit_score         111
+    fin_asset_trend_score         106
+        installment_ratio          74
+    card_cash_service_amt          65
+              mean_amount          61
+                join_days          52
+               min_amount          51
+          amt_trend_ratio          49
+    ======================================================================
 </details>
 
 <details>
