@@ -123,7 +123,7 @@
   - **모델:** LightGBM
   - **결과:**
 
-============================== [ V1_Baseline RESULT ] ==============================
+======= [ V1_Baseline RESULT ] =======
 Final Score: 0.4230 (AUC: 0.7804, LTV_Score: 0.0657)
 LTV RMSE: 1,515,256
 
