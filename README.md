@@ -189,8 +189,6 @@ LTV RMSE: 1,515,256
   - **결과:** Churn AUC v3 : 0.7830, LTV RMSE  v3 : 1,406,781
 </details>
 
-=============================================
-
 <details>
   <summary><b>exp_v4: 하이퍼파라미터 최적화 및 교차검 </b></summary>
   
