@@ -190,7 +190,7 @@ LTV RMSE: 1,515,256
 </details>
 
 <details>
-  <summary><b>exp_v4: 하이퍼파라미터 최적화 및 교차검 </b></summary>
+  <summary><b>exp_v4: 하이퍼파라미터 최적화 및 교차검증 </b></summary>
   
   - **모델:** LightGBM
   - **변경 사항:**
