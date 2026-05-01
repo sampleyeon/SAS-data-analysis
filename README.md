@@ -219,33 +219,36 @@ LTV RMSE: 1,515,256
         - last_month_freq
   - **결과:** Churn AUC v3 : 0.7830, LTV RMSE  v3 : 1,406,781
 
-[ V3_Feature_Eng Churn Top 10 ]
+  [ V3_Churn Top 10 ] 
 
-feature,importance
-total_deposit_balance,165
-card_loan_amt,139
-credit_score,93
-card_cash_service_amt,59
-fin_asset_trend_score,38
-installment_ratio,24
-mean_purchase_gap,22
-amt_last_1m,19
-amt_prev_4m,18
-spend_drop_ratio,17
+| feature | importance |
+|--------|-----------|
+| total_deposit_balance | 165 |
+| card_loan_amt | 139 |
+| credit_score | 93 |
+| card_cash_service_amt | 59 |
+| fin_asset_trend_score | 38 |
+| installment_ratio | 24 |
+| mean_purchase_gap | 22 |
+| amt_last_1m | 19 |
+| amt_prev_4m | 29 |
+| spend_drop_ratio | 17 |
+  
+    
+  [ V3_LTV Top 10 ]
 
-[ V3_Feature_Eng LTV Top 10 ]
-
-feature,importance
-total_deposit_balance,1003
-card_loan_amt,820
-fin_asset_trend_score,405
-credit_score,380
-mean_amount,299
-age,299
-min_amount,262
-installment_ratio,250
-online_ratio,249
-monthly_amt_std,233
+| feature | importance |
+|--------|-----------|
+| total_deposit_balance | 1003 |
+| card_loan_amt | 820 |
+| fin_asset_trend_score | 405 |
+| credit_score | 380 |
+| mean_amount | 262 |
+| age | 299 |
+| min_amount | 262 |
+| installment_ratio | 250 |
+| online_ratio | 249 |
+| monthly_amt_std | 233 |
 
 
 </details>
@@ -257,7 +260,6 @@ monthly_amt_std,233
   - **변경 사항:**
     - **과적합(Overfitting) 방지**: L1 규제(`reg_alpha`)와 L2 규제(`reg_lambda`)를 추가하여 복잡한 모델이 학습 데이터에만 치중되지 않도록 제어.
     - **학습 정밀도 최적화**: `learning_rate`를 기존보다 낮은 `0.005`로 설정하고, `num_leaves`를 `63`으로 늘려 데이터의 미세한 패턴을 더 깊게 학습하도록 유도.
-    - **데이터 누수(Data Leakage) 완전 차단**: v2에서 발견한 이슈를 반영하여, 오직 Train Fold의 통계치로만 인코딩을 수행하고 Validation Fold는 변환만 적용.
   
   - **결과:** Churn AUC v4 : 0.78923, LTV RMSE  v4 : 1,401,187
 </details>
