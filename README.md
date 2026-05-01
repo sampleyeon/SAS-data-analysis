@@ -256,9 +256,8 @@ LTV RMSE: 1,515,256
 <details>
   <summary><b>exp_v4: 하이퍼파라미터 최적화 및 교차검증 </b></summary>
   
-  - **모델:**
-    - **XGBoost**: early_stopping_rounds를 포함한 생성자 최적화로 학습 안정성 확보.
-    - **lightGBM**: 트리 깊이 및 scale_pos_weight 조정을 통한 이탈 클래스 불균형 해소    
+  - **모델:** LightGBM
+    
   - **변경 사항:**
     - **과적합(Overfitting) 방지**: 단순 RFM(Recency, Frequency, Monetary)을 넘어, 최근 1개월 대 이전 5개월의 소비 트렌드 및 구매 가속도(velocity_amt) 피처를 추가하여 고객의 이탈 징후를 조기에 포착.
     - **앙상블 예측 시스템 구축**: LGBM과 XGBoost를 결합한 소프트 보팅(Soft Voting) 방식의 앙상블을 적용하여 단일 모델의 편향(Bias)을 줄이고 예측 성능을 극대화.
@@ -268,14 +267,17 @@ LTV RMSE: 1,515,256
 </details>
 
 <details>
-  <summary><b>exp_v5: 하이퍼파라미터 최적화 및 교차검증 </b></summary>
+  <summary><b>exp_v5: 앙상블 및 피처 최적화 </b></summary>
   
-  - **모델:** LightGBM
+  - **모델:** 
+    - **XGBoost**: early_stopping_rounds를 포함한 생성자 최적화로 학습 안정성 확보.
+    - **lightGBM**: 트리 깊이 및 scale_pos_weight 조정을 통한 이탈 클래스 불균형 해소
   - **변경 사항:**
     - **가속도 기반 피처 엔지니어링**: L1 규제(`reg_alpha`)와 L2 규제(`reg_lambda`)를 추가하여 복잡한 모델이 학습 데이터에만 치중되지 않도록 제어.
     - **학습 정밀도 최적화**: `learning_rate`를 기존보다 낮은 `0.005`로 설정하고, `num_leaves`를 `63`으로 늘려 데이터의 미세한 패턴을 더 깊게 학습하도록 유도.
   
   - **결과:** Churn AUC v5 : 0.7924, LTV RMSE  v5 : 1,385,450
+
 </details>
 
 =============================================
