@@ -168,6 +168,37 @@ LTV RMSE: 1,515,256
   - **모델:** LightGBM
   - **변경 사항:** LTV sqrt 변환
   - **결과:** Churn AUC v2 : 0.7829 , LTV RMSE v2 (sqrt 변환) : 1,418,370
+
+  [ V2_Churn Top 10 ] 
+
+| feature | importance |
+|--------|-----------|
+| total_deposit_balance | 175 |
+| card_loan_amt | 165 |
+| credit_score | 117 |
+| card_cash_service_amt | 82 |
+| fin_asset_trend_score | 54 |
+| amt_prev_1m | 35 |
+| installment_ratio | 32 |
+| online_ratio | 30 |
+| join_days | 29 |
+| min_amount | 25 |
+  
+    
+[ V2_LTV Top 10 ]
+| feature | importance |
+|--------|-----------|
+| fin_asset_trend_score | 110 |
+| min_amount | 85 |
+| join_days | 84 |
+| mean_amount | 80 |
+| amt_prev_5m | 79 |
+| max_amount | 70 |
+| total_deposit_balance | 66 |
+| amt_last_1m | 65 |
+| credit_score | 58 |
+| online_ratio | 54 |
+  
 </details>
 
 <details>
@@ -187,6 +218,36 @@ LTV RMSE: 1,515,256
         - monthly_amt_std
         - last_month_freq
   - **결과:** Churn AUC v3 : 0.7830, LTV RMSE  v3 : 1,406,781
+
+[ V3_Feature_Eng Churn Top 10 ]
+
+feature,importance
+total_deposit_balance,165
+card_loan_amt,139
+credit_score,93
+card_cash_service_amt,59
+fin_asset_trend_score,38
+installment_ratio,24
+mean_purchase_gap,22
+amt_last_1m,19
+amt_prev_4m,18
+spend_drop_ratio,17
+
+[ V3_Feature_Eng LTV Top 10 ]
+
+feature,importance
+total_deposit_balance,1003
+card_loan_amt,820
+fin_asset_trend_score,405
+credit_score,380
+mean_amount,299
+age,299
+min_amount,262
+installment_ratio,250
+online_ratio,249
+monthly_amt_std,233
+
+
 </details>
 
 <details>
