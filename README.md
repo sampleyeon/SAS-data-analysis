@@ -171,7 +171,7 @@ LTV RMSE: 1,515,256
 </details>
 
 <details>
-  <summary><b>exp_v3: feature engineering 실험 → 실패 → 정리된 최종 모델</b></summary>
+  <summary><b>exp_v3: feature engineering </b></summary>
   
   - **모델:** LightGBM
   - **변경 사항:**
