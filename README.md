@@ -263,7 +263,7 @@ LTV RMSE: 1,515,256
     - **앙상블 예측 시스템 구축**: LGBM과 XGBoost를 결합한 소프트 보팅(Soft Voting) 방식의 앙상블을 적용하여 단일 모델의 편향(Bias)을 줄이고 예측 성능을 극대화.
     - **타겟 데이터 분포 최적화**: LTV(Life Time Value) 예측 시 왜도(Skewness) 문제를 해결하기 위해 Square Root(sqrt) 변환을 적용, 모델이 롱테일 분포의 데이터를 더 효과적으로 학습하도록 개선.
   
-  - **결과:** Churn AUC v4 : 0.78923, LTV RMSE  v4 : 1,401,187
+  - **결과:** Churn AUC v4 : 0.7923, LTV RMSE  v4 : 1,401,187
 </details>
 
 <details>
